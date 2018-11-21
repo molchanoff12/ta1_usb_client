@@ -76,7 +76,8 @@ class MainWindow(QtWidgets.QMainWindow, main_window.Ui_MainWindow):
         home_dir = os.getcwd()
         try:
             os.mkdir(home_dir + "\\Config")
-        except OSError:
+        except OSError as error:
+            print(error)
             pass
         file_name = QtWidgets.QFileDialog.getOpenFileName(
             self,
@@ -91,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow, main_window.Ui_MainWindow):
     def save_cfg(self):
         home_dir = os.getcwd()
         config = configparser.ConfigParser()
-        config = self.units_widgets.get_cfg(self.config)
+        config = self.units_widgets.get_cfg(config)
         try:
             os.mkdir(home_dir + "\\Config")
         except OSError:

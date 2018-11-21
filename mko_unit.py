@@ -117,6 +117,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
             self.table_data = parc_data.frame_parcer(self.data)
         else:
             self.write()
+            self.table_data = parc_data.frame_parcer(self.data)
         pass
 
     def state_check(self):

@@ -45,7 +45,6 @@ class TA1:
         for i in range(36):
             bcputw(i, 0xFEFE)
         control_word = ((addr & 0x1F) << 11) + (0x00 << 10) + ((subaddr & 0x1F) << 5) + (leng & 0x1F)
-        bcdefbus(self.bus)
         bcputw(0, control_word)
         for i in range(leng):
             bcputw(i+1, data[i])
@@ -56,9 +55,9 @@ class TA1:
             self.bus_state = 1 if self.bus == BUS_1 else 2
             self.change_bus()
             bcputw(0, control_word)
-            bcstart(1, DATA_RT_BC)
+            bcstart(1, DATA_BC_RT)
             self.command_word = bcgetw(0)
-            self.answer_word = bcgetansw(DATA_RT_BC) & 0xFFFF  # bcgetw(1)
+            self.answer_word = bcgetansw(DATA_BC_RT) & 0xFFFF  # bcgetw(1)
         if self.answer_word == 0xFEFE:
             self.state = 2
         return self.answer_word
@@ -71,7 +70,6 @@ class TA1:
         for i in range(36):
             bcputw(i, 0xFEFE)
         control_word = ((addr & 0x1F) << 11) + (0x01 << 10) + ((subaddr & 0x1F) << 5) + (leng & 0x1F)
-        bcdefbus(self.bus)
         bcputw(0, control_word)
         bcstart(1, DATA_RT_BC)
         self.command_word = bcgetw(0)
