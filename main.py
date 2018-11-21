@@ -6,7 +6,7 @@ import configparser
 import os
 
 
-class MainWindow(QtWidgets.QMainWindow, main_window.Ui_Form):
+class MainWindow(QtWidgets.QMainWindow, main_window.Ui_MainWindow):
     def __init__(self):
         # Это здесь нужно для доступа к переменным, методам
         # и т.д. в файле design.py

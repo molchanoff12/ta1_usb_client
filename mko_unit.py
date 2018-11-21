@@ -7,6 +7,8 @@ import parc_data
 
 
 class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
+    action_signal = QtCore.pyqtSignal([list])
+
     def __init__(self, parent, **kw):
         # Это здесь нужно для доступа к переменным, методам
         # и т.д. в файле design.py
@@ -67,7 +69,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         data = self.cfg_dict.get("data", "0 0 0 0").split(" ")
         self.data = [int(var, 16) for var in data]
         self.insert_data(self.data)
-        self.action_state = 0 if self.cfg_dict.get("subaddr", "read") else 1
+        self.action_state = 0 if self.cfg_dict.get("type", "read") in "read" else 1
         if self.action_state == 0:
             self.RWBox.setCurrentText("Чтение")
         else:
@@ -84,7 +86,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.cfg_dict["leng"] = "%d" % self.leng
         self.get_data()
         self.cfg_dict["data"] = " ".join(["%04X" % var for var in self.data])
-        self.cfg_dict["type"] = "read" if self.action_state == 0 else "write"
+        self.cfg_dict["type"] = "read" if self.RWBox.currentText() in "Чтение" else "write"
         return self.cfg_dict
 
     def write(self):
@@ -146,7 +148,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
             for column in range(self.DataTable.columnCount()):
                 try:
                     table_item = QtWidgets.QTableWidgetItem("%04X" % data[row*8 + column])
-                except IndexError:
+                except (IndexError, TypeError):
                     table_item = QtWidgets.QTableWidgetItem("0000")
                 self.DataTable.setItem(row, column, table_item)
         pass
