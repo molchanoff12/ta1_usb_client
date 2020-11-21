@@ -2,8 +2,10 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 import mko_unit_widget
 from mko import *
+import main_window
 import configparser
 import parc_data
+import os
 
 
 class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
@@ -30,7 +32,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.ta1_mko = TA1()
         self.ta1_mko.init()
         # конфигурация
-        self.cfg_dict = {"addr": "22",
+        self.cfg_dict = {"addr": "1",
                          "subaddr": "1",
                          "leng": "32",
                          "data": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
@@ -69,11 +71,18 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         data = self.cfg_dict.get("data", "0 0 0 0").split(" ")
         self.data = [int(var, 16) for var in data]
         self.insert_data(self.data)
-        self.action_state = 0 if self.cfg_dict.get("type", "read") in "read" else 1
+        if self.cfg_dict.get("type", "read") in "read":
+            self.action_state = 0
+        elif self.cfg_dict.get("type", "read") in "write":
+            self.action_state = 1
+        else:
+            self.action_state = 2
         if self.action_state == 0:
             self.RWBox.setCurrentText("Чтение")
-        else:
+        elif self.action_state == 1:
             self.RWBox.setCurrentText("Запись")
+        else:
+            self.RWBox.setCurrentText("КУ")
 
     def get_cfg(self):
         self.name = self.NameLine.text()
@@ -86,7 +95,12 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.cfg_dict["leng"] = "%d" % self.leng
         self.get_data()
         self.cfg_dict["data"] = " ".join(["%04X" % var for var in self.data])
-        self.cfg_dict["type"] = "read" if self.RWBox.currentText() in "Чтение" else "write"
+        if self.RWBox.currentText() in "Чтение":
+            self.cfg_dict["type"] = "read"
+        elif self.RWBox.currentText() in "Запись":
+            self.cfg_dict["type"] = "write"
+        else:
+            self.cfg_dict["type"] = "ctrl"
         return self.cfg_dict
 
     def write(self):
@@ -111,17 +125,29 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.state_check()
         pass
 
+    def ctrl(self):
+        self.connect()
+        self.data = self.ta1_mko.Send_Cntrl_Comm(int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
+                                            int(self.LengSpinBox.value()))
+        self.insert_data(self.data)
+        self.AWLine.setText("0x{:04X}".format(self.ta1_mko.answer_word))
+        self.CWLine.setText("0x{:04X}".format(self.ta1_mko.command_word))
+        self.state_check()
+        self.ta1_mko.disconnect()
+        pass
+
     def action(self):
         if self.RWBox.currentText() in "Чтение":  # read
             self.read()
             self.table_data = parc_data.frame_parcer(self.data)
-        else:
+        elif self.RWBox.currentText() in "Запись":
             self.write()
             self.table_data = parc_data.frame_parcer(self.data)
+        else:
+            self.ctrl()
         pass
 
     def state_check(self):
-        # print(self.state, self.ta1_mko.bus_state)
         self.state = self.ta1_mko.state
         if self.state == 1:
             self.StatusLabel.setText("TA1-USB")
@@ -159,7 +185,6 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         for row in range(self.DataTable.rowCount()):
             for column in range(self.DataTable.columnCount()):
                 data.append(int(self.DataTable.item(row, column).text(), 16))
-                # print(row, column, int(self.DataTable.item(row, column).text(), 16))
         self.data = data
         return self.data
 
@@ -224,8 +249,118 @@ class Widgets(QtWidgets.QVBoxLayout):
         return config
 
 
+class MainWindow(QtWidgets.QMainWindow, main_window.Ui_MainWindow):
+    def __init__(self):
+        # Это здесь нужно для доступа к переменным, методам
+        # и т.д. в файле design.py
+        super().__init__()
+        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+        #
+        self.config = None
+        self.config_file = None
+        # контейнеры для вставки юнитов
+        self.units_widgets = Widgets(self.scrollAreaWidgetContents)
+        self.units_widgets.action.connect(self.data_table_slot)
+        self.setLayout(self.units_widgets)
+        # привязка сигналов к кнопкам
+        self.AddUnitPButt.clicked.connect(self.units_widgets.add_unit)
+        self.DltUnitPButt.clicked.connect(self.dlt_unit)
+        self.DltAllUnitsPButt.clicked.connect(self.units_widgets.delete_all_units)
+        self.LoadCfgPButt.clicked.connect(self.load_cfg)
+        self.SaveCfgPButt.clicked.connect(self.save_cfg)
+        #
+        self.load_init_cfg()
+
+    def dlt_unit(self):
+        n = self.DltUnitNumSBox.value()
+        self.units_widgets.delete_unit_by_num(n)
+        pass
+
+    def data_table_slot(self):
+        # на всякий пожарный сохраняем текущую конфигурацию
+        self.save_init_cfg()
+        #
+        table_data = self.units_widgets.table_data
+        self.DataTable.setRowCount(len(table_data))
+        for row in range(len(table_data)):
+            for column in range(self.DataTable.columnCount()):
+                try:
+                    table_item = QtWidgets.QTableWidgetItem(table_data[row][column])
+                    self.DataTable.setItem(row, column, table_item)
+                except IndexError:
+                    pass
+        pass
+
+    def load_init_cfg(self):
+        self.config = configparser.ConfigParser()
+        file_name = "init.cfg"
+        self.config.read(file_name)
+        # print(self.config.sections())
+        if self.config.sections():
+            self.units_widgets.load_cfg(self.config)
+        else:
+            self.units_widgets.add_unit()
+        pass
+
+    def save_init_cfg(self):
+        self.config = configparser.ConfigParser()
+        self.config = self.units_widgets.get_cfg(self.config)
+        # print(self.config)
+        file_name = "init.cfg"
+        try:
+            with open(file_name, 'w') as configfile:
+                self.config.write(configfile)
+        except FileNotFoundError:
+            pass
+        pass
+
+    def load_cfg(self):
+        config = configparser.ConfigParser()
+        home_dir = os.getcwd()
+        try:
+            os.mkdir(home_dir + "\\Config")
+        except OSError as error:
+            print(error)
+            pass
+        file_name = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            "Открыть файл конфигурации",
+            home_dir + "\\Config",
+            r"config(*.cfg);;All Files(*)"
+        )[0]
+        config.read(file_name)
+        self.units_widgets.load_cfg(config)
+        pass
+
+    def save_cfg(self):
+        home_dir = os.getcwd()
+        config = configparser.ConfigParser()
+        config = self.units_widgets.get_cfg(config)
+        try:
+            os.mkdir(home_dir + "\\Config")
+        except OSError:
+            pass
+        file_name = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "Сохранить файл конфигурации",
+            home_dir + "\\Config",
+            r"config(*.cfg);;All Files(*)"
+        )[0]
+        try:
+            with open(file_name, 'w') as configfile:
+                config.write(configfile)
+        except FileNotFoundError:
+            pass
+        pass
+
+    def closeEvent(self, event):
+        self.save_init_cfg()
+        self.close()
+        pass
+
+
 if __name__ == '__main__':  # Если мы запускаем файл напрямую, а не импортируем
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
-    window = Widget()  # Создаём объект класса ExampleApp
+    window = MainWindow()  # Создаём объект класса ExampleApp
     window.show()  # Показываем окно
     app.exec_()  # и запускаем приложение

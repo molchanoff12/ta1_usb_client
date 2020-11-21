@@ -2,16 +2,18 @@
 
 # Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.13.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1197, 600)
+        MainWindow.resize(1250, 709)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -31,7 +33,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 731, 578))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 731, 679))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.horizontalLayout.addWidget(self.scrollArea)
@@ -110,10 +112,15 @@ class Ui_MainWindow(object):
         self.DataTable.setObjectName("DataTable")
         self.DataTable.setColumnCount(2)
         item = QtWidgets.QTableWidgetItem()
+        item.setText("Имя")
         self.DataTable.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.DataTable.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.DataTable.setItem(0, 0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.DataTable.setItem(1, 0, item)
         self.DataTable.horizontalHeader().setCascadingSectionResizes(False)
         self.DataTable.horizontalHeader().setDefaultSectionSize(150)
         self.DataTable.horizontalHeader().setMinimumSectionSize(50)
@@ -134,8 +141,10 @@ class Ui_MainWindow(object):
         self.DltAllUnitsPButt.setText(_translate("MainWindow", "Удалить все"))
         self.LoadCfgPButt.setText(_translate("MainWindow", "Загрузить"))
         self.SaveCfgPButt.setText(_translate("MainWindow", "Сохранить"))
-        item = self.DataTable.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Имя"))
         item = self.DataTable.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Значение"))
-
+        __sortingEnabled = self.DataTable.isSortingEnabled()
+        self.DataTable.setSortingEnabled(False)
+        item = self.DataTable.item(0, 0)
+        item.setText(_translate("MainWindow", " "))
+        self.DataTable.setSortingEnabled(__sortingEnabled)

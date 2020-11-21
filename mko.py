@@ -1,6 +1,5 @@
 from WDMTMKv2 import *
 
-
 #  класс работы с МКО #
 class TA1:
     def __init__(self):
@@ -88,6 +87,18 @@ class TA1:
             word = bcgetw(i)
             frame.append(word)
         return frame
+
+    def Send_Cntrl_Comm(self, addr, subaddr, leng):
+        self.bus_state = 0
+        self.change_bus()
+        control_word = ((addr & 0x1F) << 11) + (0x00 << 10) + ((subaddr & 0x1F) << 5) + (leng & 0x1F)
+        bcputw(0, control_word)
+        bcstart(1, CTRL_C_A)
+        self.command_word = bcgetw(0)
+        self.answer_word = bcgetansw(CTRL_C_A) & 0xFFFF
+        if self.answer_word == 0xFEFE:
+            self.state = 2
+        return self.answer_word
 
 
 # класс для разбора подпрограмм для создания циклограмм
