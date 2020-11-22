@@ -103,7 +103,7 @@ class TA1:
 
 # класс для разбора подпрограмм для создания циклограмм
 # циклограмма согласно данному шаблону
-# ["Name", [[Address, Subaddress, Wr/R, [Data], Data leng, Start time, Finish time, Interval, Delay], [...], [...]]]
+# ["Name", [[Address, Subaddress, Wr/R, [Data], Data length, Start time, Finish time, Interval, Delay], [...], [...]]]
 #    |          |          |        |      |         |          |           |          |         |
 #    |          |          |        |      |         |          |           |          |         -- Задержка отправки
 #    |          |          |        |      |         |          |           |          --- Интервал отправки

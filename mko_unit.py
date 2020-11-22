@@ -34,7 +34,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         # конфигурация
         self.cfg_dict = {"addr": "1",
                          "subaddr": "1",
-                         "leng": "32",
+                         "length": "32",
                          "data": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
                          "name": "Test",
                          "type": "write",
@@ -66,7 +66,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.AddrSpinBox.setValue(int(self.addr))
         self.subaddr = self.cfg_dict.get("subaddr", "1")
         self.SubaddrSpinBox.setValue(int(self.subaddr))
-        self.leng = self.cfg_dict.get("leng", "1")
+        self.leng = self.cfg_dict.get("length", "1")
         self.LengSpinBox.setValue(int(self.leng))
         data = self.cfg_dict.get("data", "0 0 0 0").split(" ")
         self.data = [int(var, 16) for var in data]
@@ -92,7 +92,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.subaddr = self.SubaddrSpinBox.value()
         self.cfg_dict["subaddr"] = "%d" % self.subaddr
         self.leng = self.LengSpinBox.value()
-        self.cfg_dict["leng"] = "%d" % self.leng
+        self.cfg_dict["length"] = "%d" % self.leng
         self.get_data()
         self.cfg_dict["data"] = " ".join(["%04X" % var for var in self.data])
         if self.RWBox.currentText() in "Чтение":
