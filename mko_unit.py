@@ -2,7 +2,7 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 import mko_unit_widget
 import ta1_mko
-import main_window
+import ta1_usb_client_widget
 import configparser
 import parc_data
 import os
@@ -249,7 +249,7 @@ class Widgets(QtWidgets.QVBoxLayout):
         return config
 
 
-class MainWindow(QtWidgets.QMainWindow, main_window.Ui_MainWindow):
+class MainWindow(QtWidgets.QWidget, ta1_usb_client_widget.Ui_Form):
     def __init__(self):
         # Это здесь нужно для доступа к переменным, методам
         # и т.д. в файле design.py
