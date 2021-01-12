@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
 import mko_unit_widget
-from mko import *
+import ta1_mko
 import main_window
 import configparser
 import parc_data
@@ -29,7 +29,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
             else:
                 pass
         #
-        self.ta1_mko = TA1()
+        self.ta1_mko = ta1_mko.Device()
         self.ta1_mko.init()
         # конфигурация
         self.cfg_dict = {"addr": "1",
@@ -105,9 +105,9 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
 
     def write(self):
         self.connect()
-        self.ta1_mko.SendToRT\
+        self.ta1_mko.send_to_rt(
             (int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
-             self.get_data(), int(self.LengSpinBox.value()))
+             self.get_data(), int(self.LengSpinBox.value())))
         self.AWLine.setText("0x{:04X}".format(self.ta1_mko.answer_word))
         self.CWLine.setText("0x{:04X}".format(self.ta1_mko.command_word))
         self.state_check()
@@ -116,18 +116,18 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
 
     def read(self):
         self.connect()
-        self.data = self.ta1_mko.ReadFromRT(int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
+        self.data = self.ta1_mko.read_from_rt(int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
                                             int(self.LengSpinBox.value()))
         self.insert_data(self.data)
         self.AWLine.setText("0x{:04X}".format(self.ta1_mko.answer_word))
         self.CWLine.setText("0x{:04X}".format(self.ta1_mko.command_word))
-        self.ta1_mko.disconnect()
         self.state_check()
+        self.ta1_mko.disconnect()
         pass
 
     def ctrl(self):
         self.connect()
-        self.data = self.ta1_mko.Send_Cntrl_Comm(int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
+        self.data = self.ta1_mko.send_cntrl_command(int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
                                             int(self.LengSpinBox.value()))
         self.insert_data(self.data)
         self.AWLine.setText("0x{:04X}".format(self.ta1_mko.answer_word))
