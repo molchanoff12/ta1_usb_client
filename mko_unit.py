@@ -4,7 +4,7 @@ import mko_unit_widget
 import ta1_mko
 import ta1_usb_client_widget
 import configparser
-import parc_data
+import oai_data_parcer
 import os
 
 
@@ -38,6 +38,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
                          "data": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
                          "name": "Test",
                          "type": "write",
+                         "channel": "first"  # first, second, roll
                          }
         self.state = 0
         self.action_state = 0
@@ -47,6 +48,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.leng = 0
         self.data = [0, 0]
         self.table_data = [["Нет данных", ""]]
+        self.channel = "first"
         #
         self.load_cfg()
         #
@@ -70,6 +72,7 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
         self.LengSpinBox.setValue(int(self.leng))
         data = self.cfg_dict.get("data", "0 0 0 0").split(" ")
         self.data = [int(var, 16) for var in data]
+        
         self.insert_data(self.data)
         if self.cfg_dict.get("type", "read") in "read":
             self.action_state = 0
@@ -106,8 +109,10 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
     def write(self):
         self.connect()
         self.ta1_mko.send_to_rt(
-            (int(self.AddrSpinBox.value()), int(self.SubaddrSpinBox.value()),
-             self.get_data(), int(self.LengSpinBox.value())))
+                                int(self.AddrSpinBox.value()),
+                                int(self.SubaddrSpinBox.value()),
+                                self.get_data(),
+                                int(self.LengSpinBox.value()))
         self.AWLine.setText("0x{:04X}".format(self.ta1_mko.answer_word))
         self.CWLine.setText("0x{:04X}".format(self.ta1_mko.command_word))
         self.state_check()
@@ -139,10 +144,10 @@ class Widget(QtWidgets.QFrame, mko_unit_widget.Ui_Frame):
     def action(self):
         if self.RWBox.currentText() in "Чтение":  # read
             self.read()
-            self.table_data = parc_data.frame_parcer(self.data)
+            self.table_data = oai_data_parcer.frame_parcer(self.data)
         elif self.RWBox.currentText() in "Запись":
             self.write()
-            self.table_data = parc_data.frame_parcer(self.data)
+            self.table_data = oai_data_parcer.frame_parcer(self.data)
         else:
             self.ctrl()
         pass
@@ -250,10 +255,10 @@ class Widgets(QtWidgets.QVBoxLayout):
 
 
 class MainWindow(QtWidgets.QWidget, ta1_usb_client_widget.Ui_Form):
-    def __init__(self):
+    def __init__(self, parent):
         # Это здесь нужно для доступа к переменным, методам
         # и т.д. в файле design.py
-        super().__init__()
+        super().__init__(parent)
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         #
         self.config = None
@@ -361,6 +366,6 @@ class MainWindow(QtWidgets.QWidget, ta1_usb_client_widget.Ui_Form):
 
 if __name__ == '__main__':  # Если мы запускаем файл напрямую, а не импортируем
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
-    window = MainWindow()  # Создаём объект класса ExampleApp
+    window = MainWindow(None)  # Создаём объект класса ExampleApp
     window.show()  # Показываем окно
     app.exec_()  # и запускаем приложение
