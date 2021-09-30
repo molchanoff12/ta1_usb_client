@@ -67,12 +67,28 @@ def frame_parcer(frame):
                         data.append(["%d: R пост.вр., с" % (i + 1), "%.3f" % val_from(frame, 2 * 15 + i * rs, 2, byteorder=b_order, k=1 / 256)])
                     #
                     pass
-                elif 0x0F0D == val_from(frame, 2, 2, byteorder=b_order):  # БДК2М системный
+                elif 0x0FFF == val_from(frame, 2, 2, byteorder=b_order):  # БДК2М системный (dev id временный)
                     data.append(["Метка кадра", "0x%04X" % val_from(frame, 0 * 2, 2, byteorder=b_order)])
                     data.append(["Определитель", "0x%04X" % val_from(frame, 1 * 2, 2, byteorder=b_order)])
+                    data.append(["Номер кадра", "%d" % val_from(frame, 1 * 2, 2, byteorder=b_order)])
                     data.append(["Ввремя, с", "%d" % val_from(frame, 3 * 2, 4, byteorder=b_order)])
                     #
-                    data.append(["Ток общ., мА", "%.1f" % val_from(frame, 10, 2, byteorder=b_order)])
+                    pereph_list = ["БЭ", "ЦМ1", "ЦМ2", "МПП1", "МПП2", "МПП3", "МПП4", "МПП5", "МПП6", "РП1", "РП2", "ДЭП", "ХДИИ"]
+                    for i, pereph in enumerate(pereph_list):
+                        data.append(["I %s, мА" % pereph, "%d" % val_from(frame, 10+2*i, 2, byteorder=b_order)])
+                    data.append(["Пит. статус", "0x%04X" % val_from(frame, 34, 2, byteorder=b_order)])
+                    data.append(["Пит. сост.", "0x%04X" % val_from(frame, 36, 2, byteorder=b_order)])
+                    data.append(["Неотв. статус", "0x%04X" % val_from(frame, 38, 2, byteorder=b_order)])
+                    data.append(["Неотв. к-во", "%d" % val_from(frame, 40, 1, byteorder=b_order)])
+                    data.append(["Перзеагр. к-во", "%d" % val_from(frame, 41, 1, byteorder=b_order)])
+                    data.append(["Время работы, с", "%d" % val_from(frame, 42, 4, byteorder=b_order)])
+                    data.append(["Время синхр. с", "%d" % val_from(frame, 46, 4, byteorder=b_order)])
+                    data.append(["Кол-во синхр", "%d" % val_from(frame, 50, 1, byteorder=b_order)])
+                    data.append(["Разница времени, с", "%d" % val_from(frame, 52, 2, byteorder=b_order)])
+                    data.append(["Температура МК", "%d" % val_from(frame, 54, 1, byteorder=b_order, signed=True)])
+                    data.append(["СТМ", "0x%01X" % val_from(frame, 55, 1, byteorder=b_order)])
+                    data.append(["Ук. записи", "%d" % val_from(frame, 56, 2, byteorder=b_order)])
+                    data.append(["Ук. чтения", "%d" % val_from(frame, 58, 2, byteorder=b_order)])
                     pass
                 else:
                     data.append(["Неизвестный определитель", "0"])
