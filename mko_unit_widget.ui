@@ -44,25 +44,6 @@
     <string>Пуск</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="SubaddrSpinBox">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>60</y>
-     <width>42</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>1</number>
-   </property>
-   <property name="maximum">
-    <number>32</number>
-   </property>
-   <property name="value">
-    <number>1</number>
-   </property>
-  </widget>
   <widget class="QLabel" name="AWLabel">
    <property name="geometry">
     <rect>
@@ -103,38 +84,6 @@
      <string>КУ</string>
     </property>
    </item>
-  </widget>
-  <widget class="QSpinBox" name="AddrSpinBox">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>60</y>
-     <width>42</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>1</number>
-   </property>
-   <property name="maximum">
-    <number>254</number>
-   </property>
-   <property name="value">
-    <number>22</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="LengLabel">
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>60</y>
-     <width>51</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Длина</string>
-   </property>
   </widget>
   <widget class="QLabel" name="StatusLabel">
    <property name="geometry">
@@ -206,38 +155,6 @@
     <set>Qt::AlignJustify|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QSpinBox" name="LengSpinBox">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>60</y>
-     <width>42</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>1</number>
-   </property>
-   <property name="maximum">
-    <number>32</number>
-   </property>
-   <property name="value">
-    <number>32</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="SubaddrLabel">
-   <property name="geometry">
-    <rect>
-     <x>110</x>
-     <y>60</y>
-     <width>51</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Субадр</string>
-   </property>
-  </widget>
   <widget class="QTableWidget" name="DataTable">
    <property name="geometry">
     <rect>
@@ -262,7 +179,7 @@
     <number>45</number>
    </attribute>
    <attribute name="verticalHeaderDefaultSectionSize">
-    <number>25</number>
+    <number>31</number>
    </attribute>
    <row>
     <property name="text">
@@ -325,19 +242,6 @@
     </property>
    </column>
   </widget>
-  <widget class="QLabel" name="AddresLabel">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>60</y>
-     <width>51</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Адрес</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -375,6 +279,116 @@
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>301</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="AddresLabel">
+      <property name="text">
+       <string>Адрес</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="SubaddrLabel">
+      <property name="text">
+       <string>СубАдр</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="LengLabel">
+      <property name="text">
+       <string>К-во</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Каналы</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QSpinBox" name="LengSpinBox">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>32</number>
+      </property>
+      <property name="value">
+       <number>32</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QComboBox" name="mkoChanCBox">
+      <item>
+       <property name="text">
+        <string>1/2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QSpinBox" name="AddrSpinBox">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>254</number>
+      </property>
+      <property name="value">
+       <number>22</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QSpinBox" name="SubaddrSpinBox">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>32</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
